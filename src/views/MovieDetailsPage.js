@@ -7,6 +7,7 @@ import {
   useRouteMatch,
   Switch,
   useHistory,
+  useLocation,
 } from 'react-router-dom';
 
 import * as movieShelfAPI from '../servises/bookshelf-api';
@@ -20,21 +21,23 @@ const Reviews = lazy(() =>
 export default function MoviesDetailsPage() {
   const { movieId } = useParams();
   const history = useHistory();
+  const location = useLocation();
   const { url, path } = useRouteMatch();
 
   const imgUrl = 'https://image.tmdb.org/t/p/w500/';
-
+  const [error, setError] = useState(null);
   const [movie, setMovie] = useState(null);
   useEffect(() => {
-    movieShelfAPI.fetchMovieDetails(movieId).then(setMovie);
+    movieShelfAPI.fetchMovieDetails(movieId).then(setMovie).catch(setError);
   }, [movieId]);
 
   return (
     <>
+      {error && history.push('/')}
       <button
         type="button"
         onClick={() => {
-          history.goBack();
+          history.push(location?.state?.from ?? '/movies');
         }}
       >
         GO BACK
@@ -81,7 +84,7 @@ export default function MoviesDetailsPage() {
       <hr />
       <Suspense fallback={<h1>Загружаем...</h1>}>
         <Switch>
-          <Route path={`${path}/cast`}>
+          <Route path={`${path}/cast`} exact>
             <Cast />
           </Route>
           <Route path={`${path}/reviews`} exact>

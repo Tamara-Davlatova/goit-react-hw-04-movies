@@ -5,6 +5,7 @@ import * as movieShelfAPI from '../servises/bookshelf-api';
 
 export default function MoviesPage() {
   const [movies, setMovies] = useState(null);
+  const [error, setError] = useState(null);
   const { url } = useRouteMatch();
   const history = useHistory();
   const location = useLocation();
@@ -21,17 +22,28 @@ export default function MoviesPage() {
       return;
     }
 
-    movieShelfAPI.fetchMovie(movieTitle).then(r => setMovies(r.results));
+    movieShelfAPI
+      .fetchMovie(movieTitle)
+      .then(r => setMovies(r.results))
+      .catch(setError);
   }, [movieTitle]);
 
   return (
     <>
+      {error && history.push('/')}
       <Form onSubmit={getMovieTitle} />
       {movies && (
         <ul>
           {movies.map(movie => (
             <li key={movie.id}>
-              <Link to={`${url}/${movie.id}`}>{movie.title}</Link>
+              <Link
+                to={{
+                  pathname: `${url}/${movie.id}`,
+                  state: { from: location },
+                }}
+              >
+                {movie.title}
+              </Link>
             </li>
           ))}
         </ul>

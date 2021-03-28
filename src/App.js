@@ -31,7 +31,7 @@ export default function App() {
           <Route path="/movies/:movieId">
             <MoviesDetailsPage />
           </Route>
-          <Redirect to="/"></Redirect>
+          <Route render={() => <Redirect to={{ pathname: '/' }} />} />
         </Switch>
       </Suspense>
     </div>
